@@ -12,7 +12,6 @@ import UIKit
 extension String {
     func sanitizedLaTexString() -> NSAttributedString {
         let pattern = "\\${2}\\s*(.*?)\\s*\\${2}"
-        
         // Matches: "$$ {LaTex Expression} $$"
         do {
             let regex = try NSRegularExpression(pattern: pattern, options: .CaseInsensitive)
@@ -27,6 +26,43 @@ extension String {
         
         print("Could not find the pattern in the string: \(self)")
         return NSAttributedString(string: self)
+    }
+    
+    func replaceLaTexMatches(matches: [NSTextCheckingResult]) -> NSAttributedString {
+        let laTexString = NSMutableAttributedString(string: self)    // Because we want superscript text
+        let reversedMatches = matches.reverse() // Take care of that for Swift 3
+        for match in reversedMatches {   // Note: We are reverse enumerating
+            // We are using groups in regex
+            let laTexExpressionRange = match.rangeAtIndex(0)
+            // This is the range that we have to replace
+            let laTexSubStringRange = match.rangeAtIndex(1)
+            // This is the expression, sans the $$
+            
+            let laTexSubString = laTexString.string.subStringWithRange(laTexSubStringRange)
+                .stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceCharacterSet())
+                .stringByReplacingOccurrencesOfString("\\times", withString: "x")
+                .stringByReplacingOccurrencesOfString("\\div", withString: "/")
+                .stringByReplacingOccurrencesOfString("^{\\circ}", withString: "º")
+                .scanLaTexText()
+            // Extension on String, unsafe for bounds! Use with caution
+            
+            var laTexAttributedSubString = NSAttributedString(string: laTexSubString)
+            
+            if laTexSubString.containsString("\\frac") {
+                laTexAttributedSubString = laTexSubString.scanLaTexFraction()
+            } else if laTexSubString.containsString("^{") {
+                laTexAttributedSubString = laTexSubString.scanLaTexMultiCharacterSuperscript()
+            } else if laTexSubString.containsString("^") {
+                laTexAttributedSubString = laTexSubString.scanLaTexSingleCharacterSuperscript()
+            } else {
+                // CrashHandler.logContentException(ContentException.laTexParsingFailure, objectID: "Expression: " + laTexSubString)
+                // continue    // yeah...
+            }
+            
+            laTexString.replaceCharactersInRange(laTexExpressionRange, withAttributedString: laTexAttributedSubString)
+        }
+        
+        return laTexString
     }
 }
 
@@ -49,21 +85,30 @@ extension String {
     }
     
     // MARK : LaTex: \\text
-    func scanLaTexText() -> NSAttributedString {
-        return NSAttributedString(string: self.scanLaTexText())
-    }
-    
     func scanLaTexText() -> String {  // \text{Quelque chose} => Quelque chose
-        let pattern = "([\\\\]\\text{(.{0,})})" //".{0,}\\{([+\\w\\s,-.\'\"]{1,})\\}.{0,}" // "\\{([\\w\\s,-.\'\"]{1,})\\}"
         do {
+            let pattern = "\\\\text\\{([\\w\\s,-.\'\"=+]{1,})\\}"
             let regex = try NSRegularExpression(pattern: pattern, options: .CaseInsensitive)
-            let matches = regex.matchesInString(self, options: NSMatchingOptions(rawValue: UInt(0)), range: NSMakeRange(0, characters.count))
-            // Swift 3:regex.matches(in: self, options: NSRegularExpression.MatchingOptions(rawValue: 0), range: NSMakeRange(0, characters.count))
-            if let range = matches.first?.rangeAtIndex(1) {
-                return self.subStringWithRange(range)
+            let matches = regex.matchesInString(self, options: NSMatchingOptions(rawValue: 0), range: NSMakeRange(0, self.characters.count))
+            
+            var resultString = self
+            
+            for match in matches.reverse() {
+                let rangeToReplace = match.rangeAtIndex(0)
+                let rangeOfText = match.rangeAtIndex(1)
+                
+                let textRange =  rangeFromNSRange(rangeOfText)
+                let text = resultString.substringWithRange(textRange)
+                
+                let fullRangeToReplace = rangeFromNSRange(rangeToReplace)
+                
+                resultString.replaceRange(fullRangeToReplace, with: text)
+                
             }
+            
+            return resultString
         } catch let error {
-            print("Failed to create regex pattern: \(error)")
+            print(error)
         }
         return self
     }
@@ -136,7 +181,7 @@ extension String {
     
     // MARK: LaTex: ^A
     func scanLaTexSingleCharacterSuperscript() -> NSAttributedString {   // ^{ABCD} ==> mettre en exposant le contenu des {}
-        let pattern = ".{0,}(\\^\\w{1}).{0,}" // "[\\^](\\w){1}"
+        let pattern = ".*(\\^\\w{1}).*" // "[\\^](\\w){1}"
         do {
             let regex = try NSRegularExpression(pattern: pattern, options: .CaseInsensitive)
             let matches = regex.matchesInString(self, options: NSMatchingOptions(rawValue: 0), range: NSMakeRange(0, characters.count))
@@ -167,45 +212,5 @@ extension String {
         }
         
         return NSMutableAttributedString(string: self)
-    }
-    
-    func replaceLaTexMatches(matches: [NSTextCheckingResult]) -> NSAttributedString {
-        let laTexString = NSMutableAttributedString(string: self)    // Because we want superscript text
-        let reversedMatches = matches.reverse() // Take care of that for Swift 3
-        for match in reversedMatches {   // Note: We are reverse enumerating
-            // We are using groups in regex
-            let laTexExpressionRange = match.rangeAtIndex(0)
-            // This is the range that we have to replace
-            let laTexSubStringRange = match.rangeAtIndex(1)
-            // This is the expression, sans the $$
-            
-            let laTexSubString = laTexString.string.subStringWithRange(laTexSubStringRange).stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceCharacterSet())
-                // Extension on String, unsafe for bounds! Use with caution
-            
-            var laTexAttributedSubString = NSAttributedString()
-            
-            if laTexSubString.containsString("\\times") {
-                laTexAttributedSubString = laTexSubString.attributedStringByReplacingOccurrences(of: "\\times", with: "x")
-            } else if laTexSubString.containsString("\\div") {
-                laTexAttributedSubString = laTexSubString.attributedStringByReplacingOccurrences(of: "\\div", with: "/")
-            } else if laTexSubString.containsString("^{\\circ}") {
-                laTexAttributedSubString = laTexSubString.attributedStringByReplacingOccurrences(of: "^{\\circ}", with: "º")
-            } else if laTexSubString.containsString("\\text") {
-                laTexAttributedSubString = laTexSubString.scanLaTexText()
-            } else if laTexSubString.containsString("\\frac") {
-                laTexAttributedSubString = laTexSubString.scanLaTexFraction()
-            } else if laTexSubString.containsString("^{") {
-                laTexAttributedSubString = laTexSubString.scanLaTexMultiCharacterSuperscript()
-            } else if laTexSubString.containsString("^") {
-                laTexAttributedSubString = laTexSubString.scanLaTexSingleCharacterSuperscript()
-            } else {
-                // CrashHandler.logContentException(ContentException.laTexParsingFailure, objectID: "Expression: " + laTexSubString)
-                continue    // yeah...
-            }
-            
-            laTexString.replaceCharactersInRange(laTexExpressionRange, withAttributedString: laTexAttributedSubString)
-        }
-        
-        return laTexString
     }
 }

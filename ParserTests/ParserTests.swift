@@ -18,21 +18,7 @@ let multiCharacterSuperscript = "Before a superscript  $$ ^{Hello} $$  after the
 let superscriptAttributes = [ NSBaselineOffsetAttributeName : 5, NSFontAttributeName : UIFont.systemFontOfSize(10.0) ] as [String : AnyObject]
 
 class ParserTests: XCTestCase {
-    // MARK: Text LaTex
-    func testCanReplaceSpacePaddedTextLaTex() {
-        // {someText}$${space}{LaTex Expression}{space}$${someText}
-        let testString = "Before $$ \\text{This is a day, that. ...3456 - Steve Jobs} $$ after"
-        let sanitizedString = testString.sanitizedLaTexString()
-        XCTAssertEqual(sanitizedString, NSAttributedString(string: "Before This is a day, that. ...3456 - Steve Jobs after"))
-    }
-    
-    func testCanReplaceNoSpacePaddedTextLaTex() {
-        // {someText}$${LaTex Expression}$${someText}
-        let testString = "Before $$\\text{This is a day, that. ...3456 - Steve Jobs}$$ after"
-        let sanitizedString = testString.sanitizedLaTexString()
-        XCTAssertEqual(sanitizedString, NSAttributedString(string: "Before This is a day, that. ...3456 - Steve Jobs after"))
-    }
-    
+    // MARK: Degrees LaTex
     func testCanReplaceSpacePaddedDegreesLaTex() {
         // {someText}$${space}{LaTex Expression}{space}$${someText}
         let testString = "Some text $$ 99^{\\circ} $$ trailing text"
