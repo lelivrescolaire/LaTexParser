@@ -44,13 +44,12 @@ extension String {
                 .stringByReplacingOccurrencesOfString("\\div", withString: "/")
                 .stringByReplacingOccurrencesOfString("^{\\circ}", withString: "º")
                 .scanLaTexText()
+                .scanLaTexFraction()
             // Extension on String, unsafe for bounds! Use with caution
             
             var laTexAttributedSubString = NSAttributedString(string: laTexSubString)
             
-            if laTexSubString.containsString("\\frac") {
-                laTexAttributedSubString = laTexSubString.scanLaTexFraction()
-            } else if laTexSubString.containsString("^{") {
+            if laTexSubString.containsString("^{") {
                 laTexAttributedSubString = laTexSubString.scanLaTexMultiCharacterSuperscript()
             } else if laTexSubString.containsString("^") {
                 laTexAttributedSubString = laTexSubString.scanLaTexSingleCharacterSuperscript()
@@ -114,27 +113,34 @@ extension String {
     }
     
     // MARK : LaTex: \\frac
-    func scanLaTexFraction() -> NSAttributedString {
-        return NSAttributedString(string: self.scanLaTexFraction())
-    }
-    
     func scanLaTexFraction() -> String {
-        let pattern = "\\d{1,}"
+        let pattern = "\\\\[df]rac\\{(.*)\\}\\{(.*)\\}" //"\\\\[df]rac{(.*)(.*)\\}"
         do {
             let regex = try NSRegularExpression(pattern: pattern, options: .CaseInsensitive)
             let matches = regex.matchesInString(self, options: NSMatchingOptions(rawValue: 0), range: NSMakeRange(0, characters.count))
             //matches(in: self, options: NSRegularExpression.MatchingOptions(rawValue: 0), range: NSMakeRange(0, characters.count))
-            guard matches.count == 2 else {
-                print("We either have a data problem or specs have changed.")
-                print("More than 2 numbers defining a fraction, returning original string")
-                return self
-            }
-            let numeratorRange = matches[0].range
-            let denominatorRange = matches[1].range
-            let numerator = subStringWithRange(numeratorRange)
-            let denominator = subStringWithRange(denominatorRange)
             
-            return numerator + " / " + denominator
+            var resultString = self
+            
+            for match in matches.reverse() {
+                guard  match.numberOfRanges == 3 else {
+                    print("We either have a data problem or specs have changed.")
+                    print("More than 2 numbers defining a fraction, returning original string")
+                    return self
+                }
+                let rangeToReplace = match.rangeAtIndex(0)
+                let numeratorRange = match.rangeAtIndex(1)   // numerator
+                let denominatorRange = match.rangeAtIndex(2)   // denominator
+                
+                let numerator = subStringWithRange(numeratorRange)
+                let denominator = subStringWithRange(denominatorRange)
+                
+                let fullRangeToReplace = rangeFromNSRange(rangeToReplace)
+                
+                resultString.replaceRange(fullRangeToReplace, with: numerator + " / " + denominator)
+            }
+            
+            return resultString
         } catch let error {
             print(error)
         }

@@ -33,7 +33,7 @@ class ParserTests: XCTestCase {
         XCTAssertEqual(sanitizedString, NSAttributedString(string: "Some text 99º trailing text"))
     }
     
-    func testCanReplaceSpacePaddedMultiplicationLaTex() {
+    func testCanReplaceSpacePaddedFractionLaTex() {
         // {someText}$${space}{LaTex Expression}{space}$${someText}
         let testString = "this is the start of a fraction $$ \\frac{3}{4} $$ end of a fraction"
         let sanitizedString = testString.sanitizedLaTexString()
@@ -47,7 +47,7 @@ class ParserTests: XCTestCase {
         XCTAssertEqual(sanitizedString, NSAttributedString(string: "this is the start of a fraction 3 / 4 end of a fraction"))
     }
     
-    func testCanReplaceSpacePaddedFractionLaTex() {
+    func testCanReplaceSpacePaddedMultiplicationLaTex() {
         // {someText}$${space}{LaTex Expression}{space}$${someText}
         let testString = "Bonjour $$ 3 \\times 4 $$ some other text,"
         let sanitizedString = testString.sanitizedLaTexString()
