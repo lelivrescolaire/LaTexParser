@@ -106,18 +106,15 @@ extension String {
             let matches = regex.matchesInString(self, options: NSMatchingOptions(rawValue: 0), range: NSMakeRange(0, characters.count))
             // Swift 3: matches(in: self, options: NSRegularExpression.MatchingOptions(rawValue: 0), range: NSMakeRange(0, characters.count))
             if let rawSuperscriptRange = matches.first?.rangeAtIndex(1), let _ = matches.first?.rangeAtIndex(0) {
-                let characterSet = NSCharacterSet(charactersInString: "^{}")
-                let strippedString = self.stringByTrimmingCharactersInSet(characterSet)
-                    // After trim, range is modified
-                var superscriptRange = rawSuperscriptRange
-                superscriptRange.location = rawSuperscriptRange.location + 2
-                superscriptRange.length = rawSuperscriptRange.length - 3   // Since we are trimming characters: ^{} in the string
-                let fullString = NSMutableAttributedString(string: strippedString)
+                
+                //let characterSet = NSCharacterSet(charactersInString: "^{}")  // stringByTrimmingCharactersInSet(characterSet)
+                
+                let strippedString = self.subStringWithRange(rawSuperscriptRange)
                 let attributes = [
                     NSBaselineOffsetAttributeName : 5,
                     NSFontAttributeName : UIFont.systemFontOfSize(10.0) //Swift 3: systemFont(ofSize: 10.0)
                     ] as [String : AnyObject]  // Maybe we should decrease the font size
-                fullString.addAttributes(attributes, range: superscriptRange)
+                let fullString = NSMutableAttributedString(string: strippedString, attributes: attributes)
                 return fullString
             } else {
                 return NSMutableAttributedString(string: self) // No matches

@@ -25,7 +25,7 @@ class ParserTests: XCTestCase {
         let testString = "Pre E$$ ^{Hello} $$ post"
         
         let expectedString = NSMutableAttributedString(string: "Pre EHello post")
-        let range = NSMakeRange(4, 5)
+        let range = NSMakeRange(5, 5)
         expectedString.addAttributes(superscriptAttributes, range: range)
         
         let sanitizedString = testString.sanitizedLaTexString()
@@ -38,7 +38,7 @@ class ParserTests: XCTestCase {
         let testString = "Pre E$$ ^{Hello} $$ post"
         
         let expectedString = NSMutableAttributedString(string: "Pre EHello post")
-        let range = NSMakeRange(4, 5)
+        let range = NSMakeRange(5, 5)
         expectedString.addAttributes(superscriptAttributes, range: range)
         
         let sanitizedString = testString.sanitizedLaTexString()
