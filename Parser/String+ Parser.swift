@@ -91,16 +91,8 @@ extension String {
     }
     
     // MARK : LaTex: ^{ABCD}
-//    func scanLaTexMultiCharacterSuperscript() -> NSAttributedString {
-//        let attributes = [
-//            NSBaselineOffsetAttributeName : 5,
-//            NSFontAttributeName : UIFont.systemFontOfSize(10.0) //Swift 3: systemFont(ofSize: 10.0)
-//            ] as [String : AnyObject]  // Maybe we should decrease the font size
-//        return NSAttributedString(string: self.scanLaTexMultiCharacterSuperscript(), attributes: attributes)
-//    }
-    
     func scanLaTexMultiCharacterSuperscript() -> NSAttributedString {   // ^{ABCD} ==> mettre en exposant le contenu des {}
-        let pattern = "[\\^][\\{](\\w{1,})[\\}]"
+        let pattern = ".{0,}[\\^][\\{](\\w{1,})[\\}].{0,}"
         do {
             let regex = try NSRegularExpression(pattern: pattern, options: .CaseInsensitive)
             let matches = regex.matchesInString(self, options: NSMatchingOptions(rawValue: 0), range: NSMakeRange(0, characters.count))
