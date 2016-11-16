@@ -11,7 +11,8 @@ import UIKit
 
 extension String {
     func sanitizedLaTexString() -> NSAttributedString {
-        let pattern = "[\\$]{2}\\s*?([-\\\\A-Za-z0-9\\s{}^.,_\\+\'\",]{1,})\\s*?[\\$]{2}" // "[\\$]{2}\\s([\\\\A-Za-z0-9\\s{}^.,\'\"]{1,})\\s[\\$]{2}"
+        let pattern = "\\${2}\\s*(.*?)\\s*\\${2}"
+        
         // Matches: "$$ {LaTex Expression} $$"
         do {
             let regex = try NSRegularExpression(pattern: pattern, options: .CaseInsensitive)
@@ -97,7 +98,7 @@ extension String {
     
     // MARK : LaTex: ^{ABCD}
     func scanLaTexMultiCharacterSuperscript() -> NSAttributedString {   // ^{ABCD} ==> mettre en exposant le contenu des {}
-        let pattern = ".{0,}(\\^\\{\\w{1,}\\}).{0,}"
+        let pattern = ".*(\\^\\{\\w+\\}).*"
         do {
             let regex = try NSRegularExpression(pattern: pattern, options: .CaseInsensitive)
             let matches = regex.matchesInString(self, options: NSMatchingOptions(rawValue: 0), range: NSMakeRange(0, characters.count))
