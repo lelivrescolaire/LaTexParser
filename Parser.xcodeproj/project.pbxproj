@@ -13,6 +13,7 @@
 		E4576AC41DDBACB600C81BBB /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E4576AC31DDBACB600C81BBB /* Assets.xcassets */; };
 		E4576AC71DDBACB600C81BBB /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E4576AC51DDBACB600C81BBB /* LaunchScreen.storyboard */; };
 		E4576AD21DDBACB600C81BBB /* ParserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4576AD11DDBACB600C81BBB /* ParserTests.swift */; };
+		E4576ADD1DDBACE600C81BBB /* String+ Parser.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4576ADC1DDBACE600C81BBB /* String+ Parser.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -36,6 +37,7 @@
 		E4576ACD1DDBACB600C81BBB /* ParserTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ParserTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		E4576AD11DDBACB600C81BBB /* ParserTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParserTests.swift; sourceTree = "<group>"; };
 		E4576AD31DDBACB600C81BBB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		E4576ADC1DDBACE600C81BBB /* String+ Parser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "String+ Parser.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -79,6 +81,7 @@
 			children = (
 				E4576ABC1DDBACB600C81BBB /* AppDelegate.swift */,
 				E4576ABE1DDBACB600C81BBB /* ViewController.swift */,
+				E4576ADC1DDBACE600C81BBB /* String+ Parser.swift */,
 				E4576AC01DDBACB600C81BBB /* Main.storyboard */,
 				E4576AC31DDBACB600C81BBB /* Assets.xcassets */,
 				E4576AC51DDBACB600C81BBB /* LaunchScreen.storyboard */,
@@ -203,6 +206,7 @@
 			files = (
 				E4576ABF1DDBACB600C81BBB /* ViewController.swift in Sources */,
 				E4576ABD1DDBACB600C81BBB /* AppDelegate.swift in Sources */,
+				E4576ADD1DDBACE600C81BBB /* String+ Parser.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -342,11 +346,12 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				DEVELOPMENT_TEAM = D898WTLX27;
+				GCC_GENERATE_TEST_COVERAGE_FILES = NO;
 				INFOPLIST_FILE = Parser/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.zeitgeistsoftwareltd.Parser;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 3.0;
+				SWIFT_VERSION = 2.3;
 			};
 			name = Debug;
 		};
@@ -355,11 +360,12 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				DEVELOPMENT_TEAM = D898WTLX27;
+				GCC_GENERATE_TEST_COVERAGE_FILES = NO;
 				INFOPLIST_FILE = Parser/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.zeitgeistsoftwareltd.Parser;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 3.0;
+				SWIFT_VERSION = 2.3;
 			};
 			name = Release;
 		};
@@ -369,11 +375,12 @@
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				DEVELOPMENT_TEAM = D898WTLX27;
+				GCC_GENERATE_TEST_COVERAGE_FILES = NO;
 				INFOPLIST_FILE = ParserTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.zeitgeistsoftwareltd.ParserTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 3.0;
+				SWIFT_VERSION = 2.3;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Parser.app/Parser";
 			};
 			name = Debug;
@@ -384,11 +391,12 @@
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				DEVELOPMENT_TEAM = D898WTLX27;
+				GCC_GENERATE_TEST_COVERAGE_FILES = NO;
 				INFOPLIST_FILE = ParserTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.zeitgeistsoftwareltd.ParserTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 3.0;
+				SWIFT_VERSION = 2.3;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Parser.app/Parser";
 			};
 			name = Release;
