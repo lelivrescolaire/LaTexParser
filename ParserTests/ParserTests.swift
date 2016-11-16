@@ -7,8 +7,6 @@
 //
 
 import XCTest
-import UIKit
-import Foundation
 @testable import Parser
 
 let multiplicationString = "Bonjour $$ 3 \\times 4 $$ some other text,"
@@ -20,32 +18,7 @@ let multiCharacterSuperscript = "Before a superscript  $$ ^{Hello} $$  after the
 let superscriptAttributes = [ NSBaselineOffsetAttributeName : 5, NSFontAttributeName : UIFont.systemFontOfSize(10.0) ] as [String : AnyObject]
 
 class ParserTests: XCTestCase {
-    func testCanReplaceSpacePaddedMultiCharacterSuperscriptLaTex() {
-        // {someText}$${space}{LaTex Expression}{space}$${someText}
-        let testString = "Pre E$$ ^{Hello} $$ post"
-        
-        let expectedString = NSMutableAttributedString(string: "Pre EHello post")
-        let range = NSMakeRange(5, 5)
-        expectedString.addAttributes(superscriptAttributes, range: range)
-        
-        let sanitizedString = testString.sanitizedLaTexString()
-        
-        XCTAssertEqual(sanitizedString, expectedString)
-    }
-    
-    func testCanReplaceNoSpacePaddedMultiCharacterSuperscriptLaTex() {
-        // {someText}$${LaTex Expression}$${someText}
-        let testString = "Pre E$$ ^{Hello} $$ post"
-        
-        let expectedString = NSMutableAttributedString(string: "Pre EHello post")
-        let range = NSMakeRange(5, 5)
-        expectedString.addAttributes(superscriptAttributes, range: range)
-        
-        let sanitizedString = testString.sanitizedLaTexString()
-        
-        XCTAssertEqual(sanitizedString, expectedString)
-    }
-    
+    // MARK: Text LaTex
     func testCanReplaceSpacePaddedTextLaTex() {
         // {someText}$${space}{LaTex Expression}{space}$${someText}
         let testString = "Before $$ \\text{This is a day, that. ...3456 - Steve Jobs} $$ after"

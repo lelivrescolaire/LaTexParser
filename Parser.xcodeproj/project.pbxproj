@@ -14,6 +14,7 @@
 		E4576AC71DDBACB600C81BBB /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E4576AC51DDBACB600C81BBB /* LaunchScreen.storyboard */; };
 		E4576AD21DDBACB600C81BBB /* ParserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4576AD11DDBACB600C81BBB /* ParserTests.swift */; };
 		E4576ADD1DDBACE600C81BBB /* String+ Parser.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4576ADC1DDBACE600C81BBB /* String+ Parser.swift */; };
+		E48E495A1DDCAB3400323214 /* SuperscriptTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E48E49591DDCAB3400323214 /* SuperscriptTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -38,6 +39,7 @@
 		E4576AD11DDBACB600C81BBB /* ParserTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParserTests.swift; sourceTree = "<group>"; };
 		E4576AD31DDBACB600C81BBB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		E4576ADC1DDBACE600C81BBB /* String+ Parser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "String+ Parser.swift"; sourceTree = "<group>"; };
+		E48E49591DDCAB3400323214 /* SuperscriptTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SuperscriptTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -94,6 +96,7 @@
 			isa = PBXGroup;
 			children = (
 				E4576AD11DDBACB600C81BBB /* ParserTests.swift */,
+				E48E49591DDCAB3400323214 /* SuperscriptTests.swift */,
 				E4576AD31DDBACB600C81BBB /* Info.plist */,
 			);
 			path = ParserTests;
@@ -214,6 +217,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E48E495A1DDCAB3400323214 /* SuperscriptTests.swift in Sources */,
 				E4576AD21DDBACB600C81BBB /* ParserTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -420,6 +424,7 @@
 				E4576AD81DDBACB600C81BBB /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		E4576AD91DDBACB600C81BBB /* Build configuration list for PBXNativeTarget "ParserTests" */ = {
 			isa = XCConfigurationList;
@@ -428,6 +433,7 @@
 				E4576ADB1DDBACB600C81BBB /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
