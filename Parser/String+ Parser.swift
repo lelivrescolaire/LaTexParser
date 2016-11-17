@@ -11,7 +11,7 @@ import UIKit
 
 public extension String {
     public func sanitizedLaTexString() -> NSAttributedString {
-        let pattern = "\\${2}\\s*(.*?)\\s*\\${2}"
+        let pattern = "\\${2}\\s*[\\w*=+-,]\\s*\\${2}"// "\\${2}\\s*(.*?)\\s*\\${2}"
         // Matches: "$$ {LaTex Expression} $$"
         if let matches = matchesForPattern(pattern) {
             return replaceLaTexMatches(matches)
@@ -138,9 +138,12 @@ private extension String {
 private extension String {
     private func matchesForPattern(pattern: String) -> [NSTextCheckingResult]? {
         do {
+            let str = self
             let regex = try NSRegularExpression(pattern: pattern, options: .CaseInsensitive)
             let originalStringFullRange = NSMakeRange(0, self.characters.count)
-            return regex.matchesInString(self, options: NSMatchingOptions(rawValue: 0), range: originalStringFullRange)
+            let matches = regex.matchesInString(str, options: NSMatchingOptions(rawValue: 0), range: originalStringFullRange)
+            
+            return matches
         } catch let error as NSError {
             print(error.localizedDescription)
         }

@@ -18,6 +18,13 @@ let multiCharacterSuperscript = "Before a superscript  $$ ^{Hello} $$  after the
 let superscriptAttributes = [ NSBaselineOffsetAttributeName : 5, NSFontAttributeName : UIFont.systemFontOfSize(10.0) ] as [String : AnyObject]
 
 class ParserTests: XCTestCase {
+    
+    func testCanRemoveTimes() {
+        let testString = "Aux États-Unis, lʼunité habituelle est le degré Fahrenheit (°F). La relation permettant de passer dʼune température TC en degrés Celsius à une température TF en degrés Fahrenheit est la suivante :$$T_F = 1,8 \\times T_C + 32$$"
+        let sanitizedString = testString.sanitizedLaTexString()
+        XCTAssertEqual(sanitizedString, NSAttributedString(string: "Aux États-Unis, lʼunité habituelle est le degré Fahrenheit (°F). La relation permettant de passer dʼune température TC en degrés Celsius à une température TF en degrés Fahrenheit est la suivante :$$T_F = 1,8 x T_C + 32$$"))
+    }
+    
     // MARK: Degrees LaTex
     func testCanReplaceSpacePaddedDegreesLaTex() {
         // {someText}$${space}{LaTex Expression}{space}$${someText}
