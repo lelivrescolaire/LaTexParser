@@ -9,8 +9,8 @@
 import Foundation
 import UIKit
 
-extension String {
-    func sanitizedLaTexString() -> NSAttributedString {
+public extension String {
+    public func sanitizedLaTexString() -> NSAttributedString {
         let pattern = "\\${2}\\s*(.*?)\\s*\\${2}"
         // Matches: "$$ {LaTex Expression} $$"
         if let matches = matchesForPattern(pattern) {
@@ -21,7 +21,7 @@ extension String {
         return NSAttributedString(string: self)
     }
     
-    func replaceLaTexMatches(matches: [NSTextCheckingResult]) -> NSAttributedString {
+    public func replaceLaTexMatches(matches: [NSTextCheckingResult]) -> NSAttributedString {
         let laTexString = NSMutableAttributedString(string: self)    // Because we want superscript text
         let reversedMatches = matches.reverse() // Take care of that for Swift 3
         for match in reversedMatches {   // Note: We are reverse enumerating
@@ -48,35 +48,8 @@ extension String {
     }
 }
 
-extension String {
-    private func matchesForPattern(pattern: String) -> [NSTextCheckingResult]? {
-        do {
-            let regex = try NSRegularExpression(pattern: pattern, options: .CaseInsensitive)
-            let originalStringFullRange = NSMakeRange(0, self.characters.count)
-            return regex.matchesInString(self, options: NSMatchingOptions(rawValue: 0), range: originalStringFullRange)
-        } catch let error as NSError {
-            print(error.localizedDescription)
-        }
-        return nil
-    }
-    
-    private func rangeFromNSRange(range: NSRange) -> Range<Index> {
-        let start = startIndex.advancedBy(range.location)   // Swift 3: index(startIndex, offsetBy: range.location)
-        let end = start.advancedBy(range.length)    // Swift 3: index(start, offsetBy: range.length)
-        return start..<end
-    }
-    
-    private func subStringWithRange(range: NSRange) -> String {
-        let r = rangeFromNSRange(range)
-        return self[r]
-    }
-    
-    func attributedStringByReplacingOccurrences(of occurrence: String, with replacement: String) -> NSAttributedString {
-        let str: String = stringByReplacingOccurrencesOfString(occurrence, withString: replacement)
-        // Swift 3 : replacingOccurrences(of: occurrence, with: replacement)
-        return NSAttributedString(string: str)
-    }
-    
+// MARK: Expression parsers
+private extension String {
     // MARK : LaTex: \\text
     func scanLaTexText() -> String {  // \text{Quelque chose} => Quelque chose
         let pattern = "\\\\text\\{([\\w\\s,-.\'\"=+]{1,})\\}"
@@ -158,5 +131,30 @@ extension String {
         }
         
         return NSMutableAttributedString(string: self)
+    }
+}
+
+// MARK: Helpers
+private extension String {
+    private func matchesForPattern(pattern: String) -> [NSTextCheckingResult]? {
+        do {
+            let regex = try NSRegularExpression(pattern: pattern, options: .CaseInsensitive)
+            let originalStringFullRange = NSMakeRange(0, self.characters.count)
+            return regex.matchesInString(self, options: NSMatchingOptions(rawValue: 0), range: originalStringFullRange)
+        } catch let error as NSError {
+            print(error.localizedDescription)
+        }
+        return nil
+    }
+    
+    private func rangeFromNSRange(range: NSRange) -> Range<Index> {
+        let start = startIndex.advancedBy(range.location)   // Swift 3: index(startIndex, offsetBy: range.location)
+        let end = start.advancedBy(range.length)    // Swift 3: index(start, offsetBy: range.length)
+        return start..<end
+    }
+    
+    private func subStringWithRange(range: NSRange) -> String {
+        let r = rangeFromNSRange(range)
+        return self[r]
     }
 }
