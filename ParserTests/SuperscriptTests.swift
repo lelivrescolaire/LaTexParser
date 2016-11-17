@@ -14,9 +14,9 @@ class SuperscriptTests: XCTestCase {
     // Mark Single-Character Superscript
     func testCanReplaceSpacePaddedSingleCharacterSuperscriptLaTexThatHasTextBeforeAndAfter() {
         // {someText}$${space}{LaTex Expression}{space}$${someText}
-        let testString = "Pre E$$ Bonzy^XParo $$ post"
+        let testString = "Pre E$$ Bonzy^X Paro $$ post"
         
-        let expectedString = NSMutableAttributedString(string: "Pre EBonzyXParo post")
+        let expectedString = NSMutableAttributedString(string: "Pre EBonzyX Paro post")
         let range = NSMakeRange(10, 1)
         expectedString.addAttributes(superscriptAttributes, range: range)
         
@@ -27,9 +27,9 @@ class SuperscriptTests: XCTestCase {
     
     func testCanReplaceNoSpacePaddedSingleCharacterSuperscriptLaTexThatHasTextBeforeAndAfter() {
         // {someText}$${LaTex Expression}$${someText}
-        let testString = "Pre E$$Bonzy^XParo$$ post"
+        let testString = "Pre E$$Bonzy^X Paro$$ post"
         
-        let expectedString = NSMutableAttributedString(string: "Pre EBonzyXParo post")
+        let expectedString = NSMutableAttributedString(string: "Pre EBonzyX Paro post")
         let range = NSMakeRange(10, 1)
         expectedString.addAttributes(superscriptAttributes, range: range)
         

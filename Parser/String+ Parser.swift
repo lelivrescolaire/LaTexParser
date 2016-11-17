@@ -13,15 +13,8 @@ extension String {
     func sanitizedLaTexString() -> NSAttributedString {
         let pattern = "\\${2}\\s*(.*?)\\s*\\${2}"
         // Matches: "$$ {LaTex Expression} $$"
-        do {
-            let regex = try NSRegularExpression(pattern: pattern, options: .CaseInsensitive)
-            let originalStringFullRange = NSMakeRange(0, self.characters.count)
-            let matches = regex.matchesInString(self, options: NSMatchingOptions(rawValue: 0), range: originalStringFullRange)
-            // Swift 3: matches(in: self, options: NSRegularExpression.MatchingOptions(rawValue: 0), range: originalStringFullRange)
-            
+        if let matches = matchesForPattern(pattern) {
             return replaceLaTexMatches(matches)
-        } catch let error {
-            print(error)
         }
         
         print("Could not find the pattern in the string: \(self)")
@@ -45,20 +38,10 @@ extension String {
                 .stringByReplacingOccurrencesOfString("^{\\circ}", withString: "º")
                 .scanLaTexText()
                 .scanLaTexFraction()
+                .scanLaTexSuperscripts()
             // Extension on String, unsafe for bounds! Use with caution
-            
-            var laTexAttributedSubString = NSAttributedString(string: laTexSubString)
-            
-            if laTexSubString.containsString("^{") {
-                laTexAttributedSubString = laTexSubString.scanLaTexMultiCharacterSuperscript()
-            } else if laTexSubString.containsString("^") {
-                laTexAttributedSubString = laTexSubString.scanLaTexSingleCharacterSuperscript()
-            } else {
-                // CrashHandler.logContentException(ContentException.laTexParsingFailure, objectID: "Expression: " + laTexSubString)
-                // continue    // yeah...
-            }
-            
-            laTexString.replaceCharactersInRange(laTexExpressionRange, withAttributedString: laTexAttributedSubString)
+                        
+            laTexString.replaceCharactersInRange(laTexExpressionRange, withAttributedString: laTexSubString) //laTexAttributedSubString)
         }
         
         return laTexString
@@ -66,13 +49,24 @@ extension String {
 }
 
 extension String {
-    func rangeFromNSRange(range: NSRange) -> Range<Index> {
+    private func matchesForPattern(pattern: String) -> [NSTextCheckingResult]? {
+        do {
+            let regex = try NSRegularExpression(pattern: pattern, options: .CaseInsensitive)
+            let originalStringFullRange = NSMakeRange(0, self.characters.count)
+            return regex.matchesInString(self, options: NSMatchingOptions(rawValue: 0), range: originalStringFullRange)
+        } catch let error as NSError {
+            print(error.localizedDescription)
+        }
+        return nil
+    }
+    
+    private func rangeFromNSRange(range: NSRange) -> Range<Index> {
         let start = startIndex.advancedBy(range.location)   // Swift 3: index(startIndex, offsetBy: range.location)
         let end = start.advancedBy(range.length)    // Swift 3: index(start, offsetBy: range.length)
         return start..<end
     }
     
-    func subStringWithRange(range: NSRange) -> String {
+    private func subStringWithRange(range: NSRange) -> String {
         let r = rangeFromNSRange(range)
         return self[r]
     }
@@ -85,11 +79,8 @@ extension String {
     
     // MARK : LaTex: \\text
     func scanLaTexText() -> String {  // \text{Quelque chose} => Quelque chose
-        do {
-            let pattern = "\\\\text\\{([\\w\\s,-.\'\"=+]{1,})\\}"
-            let regex = try NSRegularExpression(pattern: pattern, options: .CaseInsensitive)
-            let matches = regex.matchesInString(self, options: NSMatchingOptions(rawValue: 0), range: NSMakeRange(0, self.characters.count))
-            
+        let pattern = "\\\\text\\{([\\w\\s,-.\'\"=+]{1,})\\}"
+        if let matches = matchesForPattern(pattern) {
             var resultString = self
             
             for match in matches.reverse() {
@@ -100,26 +91,18 @@ extension String {
                 let text = resultString.substringWithRange(textRange)
                 
                 let fullRangeToReplace = rangeFromNSRange(rangeToReplace)
-                
                 resultString.replaceRange(fullRangeToReplace, with: text)
-                
             }
             
             return resultString
-        } catch let error {
-            print(error)
         }
         return self
     }
     
-    // MARK : LaTex: \\frac
+    // MARK : LaTex: \\[df]rac
     func scanLaTexFraction() -> String {
-        let pattern = "\\\\[df]rac\\{(.*)\\}\\{(.*)\\}" //"\\\\[df]rac{(.*)(.*)\\}"
-        do {
-            let regex = try NSRegularExpression(pattern: pattern, options: .CaseInsensitive)
-            let matches = regex.matchesInString(self, options: NSMatchingOptions(rawValue: 0), range: NSMakeRange(0, characters.count))
-            //matches(in: self, options: NSRegularExpression.MatchingOptions(rawValue: 0), range: NSMakeRange(0, characters.count))
-            
+        let pattern = "\\\\[df]rac\\{(.*)\\}\\{(.*)\\}"
+        if let matches = matchesForPattern(pattern) {
             var resultString = self
             
             for match in matches.reverse() {
@@ -128,6 +111,7 @@ extension String {
                     print("More than 2 numbers defining a fraction, returning original string")
                     return self
                 }
+                
                 let rangeToReplace = match.rangeAtIndex(0)
                 let numeratorRange = match.rangeAtIndex(1)   // numerator
                 let denominatorRange = match.rangeAtIndex(2)   // denominator
@@ -141,80 +125,36 @@ extension String {
             }
             
             return resultString
-        } catch let error {
-            print(error)
         }
+        
         return self
     }
     
     // MARK : LaTex: ^{ABCD}
-    func scanLaTexMultiCharacterSuperscript() -> NSAttributedString {   // ^{ABCD} ==> mettre en exposant le contenu des {}
-        let pattern = ".*(\\^\\{\\w+\\}).*"
-        do {
-            let regex = try NSRegularExpression(pattern: pattern, options: .CaseInsensitive)
-            let matches = regex.matchesInString(self, options: NSMatchingOptions(rawValue: 0), range: NSMakeRange(0, characters.count))
-            // Swift 3: matches(in: self, options: NSRegularExpression.MatchingOptions(rawValue: 0), range: NSMakeRange(0, characters.count))
-            if let rawSuperscriptRange = matches.first?.rangeAtIndex(1), let _ = matches.first?.rangeAtIndex(0) {
+    func scanLaTexSuperscripts() -> NSAttributedString {   // ^{ABCD} ==> mettre en exposant le contenu des {}
+        let pattern = "\\^\\{?(\\w*)\\}?"
+        if let matches = matchesForPattern(pattern) {
+            let characterSet = NSCharacterSet(charactersInString: "^{}")
+            let attributes = [
+                NSBaselineOffsetAttributeName : 5,
+                NSFontAttributeName : UIFont.systemFontOfSize(10.0) //Swift 3: systemFont(ofSize: 10.0)
+                ] as [String : AnyObject]  // Maybe we should decrease the font size
+            
+            let resultString = NSMutableAttributedString(string: self)
+            
+            // var rangeToReplacementMapping = [(range: NSRange, replacement: String)]()
+            
+            for match in matches.reverse() where match.numberOfRanges > 1 {
+                // Note: We are not traversing the matches in reverse since we will do that when
+                let replacementRange = match.rangeAtIndex(0)
+                let superscriptRange = match.rangeAtIndex(1)
+                let replacementString = subStringWithRange(superscriptRange).stringByTrimmingCharactersInSet(characterSet)
+                let replacementAttributedString = NSAttributedString(string: replacementString, attributes: attributes)
                 
-                // Grab the whole ^{text} at range 1 and trim the culprits
-                let characterSet = NSCharacterSet(charactersInString: "^{}")
-                let strippedString = self.subStringWithRange(rawSuperscriptRange).stringByTrimmingCharactersInSet(characterSet)
-                
-                let attributes = [
-                    NSBaselineOffsetAttributeName : 5,
-                    NSFontAttributeName : UIFont.systemFontOfSize(10.0) //Swift 3: systemFont(ofSize: 10.0)
-                    ] as [String : AnyObject]  // Maybe we should decrease the font size
-                let superscriptedString = NSMutableAttributedString(string: strippedString, attributes: attributes)
-                
-                let location = rawSuperscriptRange.location  //superscriptInsertionLocation
-                
-                let rangeToReplace = rangeFromNSRange(rawSuperscriptRange)
-                let str = stringByReplacingCharactersInRange(rangeToReplace, withString: "")
-                
-                let fullString = NSMutableAttributedString(string: str)
-                fullString.insertAttributedString(superscriptedString, atIndex: location)
-                
-                return fullString
-            } else {
-                return NSMutableAttributedString(string: self) // No matches
+                resultString.replaceCharactersInRange(replacementRange, withAttributedString: replacementAttributedString)
             }
-        } catch let error {
-            print(error)
-        }
-        
-        return NSMutableAttributedString(string: self)
-    }
-    
-    // MARK: LaTex: ^A
-    func scanLaTexSingleCharacterSuperscript() -> NSAttributedString {   // ^{ABCD} ==> mettre en exposant le contenu des {}
-        let pattern = ".*(\\^\\w{1}).*" // "[\\^](\\w){1}"
-        do {
-            let regex = try NSRegularExpression(pattern: pattern, options: .CaseInsensitive)
-            let matches = regex.matchesInString(self, options: NSMatchingOptions(rawValue: 0), range: NSMakeRange(0, characters.count))
-            // Swift 3: matches(in: self, options: NSRegularExpression.MatchingOptions(rawValue: 0), range: NSMakeRange(0, characters.count))
-            if let range = matches.first?.rangeAtIndex(1) {
-                // Grab the whole ^{text} at range 1 and trim the culprits
-                let characterSet = NSCharacterSet(charactersInString: "^{}")
-                let strippedString = self.subStringWithRange(range).stringByTrimmingCharactersInSet(characterSet)
-                
-                let attributes = [
-                    NSBaselineOffsetAttributeName : 5,
-                    NSFontAttributeName : UIFont.systemFontOfSize(10.0) //Swift 3: systemFont(ofSize: 10.0)
-                    ] as [String : AnyObject]  // Maybe we should decrease the font size
-                let superscriptedString = NSMutableAttributedString(string: strippedString, attributes: attributes)
-                
-                let location = range.location  //superscriptInsertionLocation
-                
-                let rangeToReplace = rangeFromNSRange(range)
-                let str = stringByReplacingCharactersInRange(rangeToReplace, withString: "")
-                
-                let fullString = NSMutableAttributedString(string: str)
-                fullString.insertAttributedString(superscriptedString, atIndex: location)
-                
-                return fullString
-            }
-        } catch let error {
-            print(error)
+            
+            return resultString
         }
         
         return NSMutableAttributedString(string: self)
